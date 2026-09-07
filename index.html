@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<title>BREW.LOVE — NEXUS · DoubleA</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  html,body{margin:0;background:#0a0a0f;color:#e8fff4;font-family:IBM Plex Sans,system-ui,sans-serif;}
+  body{background:radial-gradient(900px 500px at 8% -8%,rgba(255,0,128,.10),transparent 50%),#0a0a0f;}
+  .glow-n{text-shadow:0 0 14px #00ff87aa;}
+  .glow-p{text-shadow:0 0 14px #ff0080aa;}
+  .card{background:linear-gradient(180deg,rgba(16,18,24,.92),rgba(10,10,15,.88));border:1px solid rgba(0,255,135,.2);}
+  .btn-n{background:#00ff87;color:#04140c;font-weight:700;}
+  .chip{border:1px solid rgba(96,239,255,.35);color:#60efff;}
+  canvas#loveViz{width:100%;height:260px;display:block;background:#050508;border-radius:14px;}
+  @media(min-width:880px){.shell{max-width:920px;margin:0 auto;}canvas#loveViz{height:320px;}}
+</style>
+</head>
+<body>
+<div class="shell min-h-screen px-4 pb-16">
+  <header class="pt-6 flex items-start justify-between gap-3">
+    <div>
+      <span class="text-[10px] tracking-[0.22em] chip px-2 py-0.5 rounded-full">DoubleA · AntManThePro</span>
+      <h1 class="text-4xl font-bold glow-n mt-2">NEXUS</h1>
+      <p class="text-xs tracking-[0.16em] text-cyan-300">NExtended Xperimental USers</p>
+      <p class="text-[11px] font-mono text-pink-500 mt-1">BREW.LOVE · flash-chill letter</p>
+    </div>
+  </header>
+  <section class="mt-8">
+    <p class="text-zinc-400 text-sm">FOR</p>
+    <h2 class="text-3xl font-bold">DOUBLE A</h2>
+    <p class="text-zinc-400 mt-2 max-w-xl">You build coffee like a rig with a bill of materials. This page is that method, written as a letter.</p>
+  </section>
+  <div class="card rounded-2xl p-3 mt-6">
+    <canvas id="loveViz"></canvas>
+    <div class="flex gap-2 mt-3">
+      <button class="btn-n flex-1 py-3 rounded-xl text-xs" id="runBtn">POUR THE LETTER</button>
+      <button class="chip px-4 py-3 rounded-xl text-xs font-mono" id="resetBtn">RESET</button>
+    </div>
+  </div>
+  <ol class="mt-6 space-y-3" id="steps"></ol>
+  <section class="card rounded-2xl p-5 mt-8">
+    <div class="text-[10px] font-mono text-green-400 tracking-widest">HOUSE METHOD · K-DUO</div>
+    <p class="mt-2 text-[15px] leading-relaxed text-zinc-200">Extract hot. Dissolve the words in the heat. Crash through the mesh. Stir until the temperature tells the truth. Then the part that must not be cooked. Then the second ice. Dilution lock.</p>
+  </section>
+  <button class="btn-n mt-6 px-5 py-3 rounded-xl text-xs" id="nameBtn">GENERATE A NAME</button>
+  <div id="names" class="grid gap-2 mt-4"></div>
+</div>
+<script>
+const PAL={neon:"#00ff87",cyan:"#60efff",hot:"#ff0080",volt:"#ffcc00"};
+const LETTER=[
+ {id:"extract",label:"Extract hot",min:1.6,line:"I saw the way you treat a machine like it has to answer for the cup."},
+ {id:"hotmix",label:"Hot-side mix",min:0.5,line:"Words that only dissolve if you say them while the heat is on."},
+ {id:"crash",label:"Flash-chill",min:0.6,line:"Through the mesh. Onto ice. Crash into what is real."},
+ {id:"quench",label:"Stir to quench",min:0.4,line:"Stay until the temperature drops and neither of us is performing."},
+ {id:"coldmix",label:"Cold-side",min:0.5,line:"Then the part that must not cook. The unspectacular keep."},
+ {id:"lock",label:"Ice-stable",min:0.5,line:"Second charge. Stir until melt stops. We do not water this down."}
+];
+const S={running:false,t0:0,progress:0,active:0};
+const total=LETTER.reduce((s,x)=>s+x.min,0)+0.4;
+function renderSteps(){
+ document.getElementById("steps").innerHTML=LETTER.map((s,i)=>`<li class=\"card rounded-2xl px-4 py-3\"><div class=\"font-semibold\">${s.label}</div><p class=\"text-sm text-zinc-400 mt-1\">${s.line}</p></li>`).join("");
+}
+const canvas=document.getElementById("loveViz"); const ctx=canvas.getContext("2d"); const parts=[];
+function size(){const dpr=Math.min(2,devicePixelRatio||1);const r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);return {w:r.width,h:r.height};}
+function spawn(x,y,col){const a=Math.random()*Math.PI*2,sp=0.4+Math.random()*1.6;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-0.4,life:1,col,r:1.6+Math.random()*2});}
+function frame(){
+ const {w,h}=size(); ctx.fillStyle="#050508"; ctx.fillRect(0,0,w,h);
+ const nodes=LETTER.map((s,i)=>({x:28+(i/(LETTER.length-1))*(w-56),y:h*0.46+Math.sin(i*0.9)*14,label:s.label}));
+ for(let i=0;i<nodes.length-1;i++){ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[i+1].x,nodes[i+1].y);ctx.strokeStyle="rgba(255,0,128,0.4)";ctx.stroke();}
+ let sim=S.running?((performance.now()-S.t0)/1000/60)*10:S.progress*total;
+ let acc=0,active=0; LETTER.forEach((s,i)=>{const st=acc;acc+=s.min;if(sim>=st)active=i;});
+ S.active=active; S.progress=Math.min(1,sim/total);
+ if(S.running&&Math.random()<0.4) spawn(nodes[Math.min(active,nodes.length-2)].x,nodes[Math.min(active,nodes.length-2)].y,[PAL.neon,PAL.cyan,PAL.hot,PAL.volt][active%4]);
+ parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.012;p.life-=0.012;ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();});
+ ctx.globalAlpha=1; for(let i=parts.length-1;i>=0;i--) if(parts[i].life<=0) parts.splice(i,1);
+ nodes.forEach((n,i)=>{ctx.fillStyle=i<=active&&(S.running||S.progress>0)?PAL.hot:"#1a1d24";ctx.beginPath();ctx.arc(n.x,n.y,7,0,Math.PI*2);ctx.fill();ctx.fillStyle=PAL.volt;ctx.font="10px monospace";ctx.textAlign="center";ctx.fillText(n.label,n.x,n.y+20);});
+ ctx.fillStyle=PAL.cyan;ctx.font="11px monospace";ctx.textAlign="left";ctx.fillText("FLASH-CHILL LETTER  "+Math.round(S.progress*100)+"%",12,16);
+ if(S.running&&S.progress>=1) S.running=false;
+ requestAnimationFrame(frame);
+}
+renderSteps(); requestAnimationFrame(frame);
+document.getElementById("runBtn").onclick=()=>{S.running=true;S.t0=performance.now();S.progress=0;};
+document.getElementById("resetBtn").onclick=()=>{S.running=false;S.progress=0;S.active=0;};
+const BANK=["Midnight Voltage","Neon Harbor","Quantum Keep","Atlas Steam","Storm Glass","Pulse Lock"];
+document.getElementById("nameBtn").onclick=()=>{document.getElementById("names").innerHTML=BANK.slice().sort(()=>Math.random()-0.5).slice(0,4).map(n=>`<div class=\"card rounded-xl px-4 py-3\"><div class=\"text-lg glow-p\">${n}</div></div>`).join("");};
+</script>
+</body>
+</html>
