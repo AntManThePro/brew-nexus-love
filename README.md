@@ -3,15 +3,18 @@
 NEXUS — NExtended Xperimental USers  
 Operator: DoubleA · AntManThePro
 
-Love plate built on the house coffee method:
+Public repo: https://github.com/AntManThePro/brew-nexus-love
 
-1. Extract hot  
-2. Hot-side mix  
-3. Flash-chill  
-4. Stir to quench  
-5. Cold-side  
-6. Ice-stable / dilution lock  
+## Make it live on GitHub (same as hood-boss / kec-shield)
 
-Open `index.html` locally or enable GitHub Pages on `main` / root.
+This connector cannot flip the Pages switch. You can. One time:
 
-Repo: https://github.com/AntManThePro/brew-nexus-love
+1. Open https://github.com/AntManThePro/brew-nexus-love/settings/pages
+2. **Source** = Deploy from a branch
+3. Branch = `main` / folder = `/ (root)`
+4. Save
+
+Live URL after that:
+https://antmanthepro.github.io/brew-nexus-love/
+
+`index.html` is already on `main`. `.nojekyll` is in the root so GitHub does not run Jekyll on the plate.
